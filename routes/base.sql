@@ -28,24 +28,3 @@ CREATE TABLE mensajes (
     FOREIGN KEY (usuario) REFERENCES usuarios(usuario) ON DELETE CASCADE
 );
 
--- 1. Insertar Grupos de Prueba
-INSERT INTO grupo (id_grupo, nombre) VALUES (1, 'Desarrollo');
-INSERT INTO grupo (id_grupo, nombre) VALUES (2, 'Diseño');
-
--- 2. Insertar Usuarios de Prueba
--- Iván y Ana están en el grupo 1 (Desarrollo). Carlos está en el grupo 2 (Diseño).
-INSERT INTO usuarios (usuario, nombre, id_grupo, admin, foto) 
-VALUES ('ivan', 'Iván Guerrero', 1, 1, 'foto_ivan.jpg');
-
-INSERT INTO usuarios (usuario, nombre, id_grupo, admin, foto) 
-VALUES ('Marcos', 'Marcos García', 1, 0, 'foto_marcos.jpg');
-
-INSERT INTO usuarios (usuario, nombre, id_grupo, admin, foto) 
-VALUES ('Jose', 'José Gonzalez', 2, 0, 'foto_jose.jpg');
-
-INSERT INTO usuarios (usuario, nombre, id_grupo, admin, foto) 
-VALUES ('Pepe', 'Pepe Ramos', 2, 0, 'foto_pepe.jpg');
-
--- 3. Insertar un mensaje inicial de prueba
-INSERT INTO mensajes (id_grupo, usuario, texto) 
-VALUES (1, 'ivan', '¡Hola! Bienvenidos al chat del grupo de Desarrollo.');
