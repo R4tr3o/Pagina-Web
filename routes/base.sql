@@ -29,4 +29,4 @@ CREATE TABLE mensajes (
 );
 
 INSERT INTO usuarios (usuario, nombre, id_grupo, admin, foto) 
-VALUES ('admin', 'admin', 0, 1, 'foto_admin.jpg');
+VALUES ('admin', 'admin', 1, 1, 'foto_admin.jpg');
