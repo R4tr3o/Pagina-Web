@@ -28,3 +28,5 @@ CREATE TABLE mensajes (
     FOREIGN KEY (usuario) REFERENCES usuarios(usuario) ON DELETE CASCADE
 );
 
+INSERT INTO usuarios (usuario, nombre, id_grupo, admin, foto) 
+VALUES ('admin', 'admin', 0, 1, 'foto_admin.jpg');
