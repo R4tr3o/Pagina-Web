@@ -1,0 +1,144 @@
+```css
+/* Estilos generales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #e8f5e9, #d0e8dc);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Contenedor del login */
+.contenedor {
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Caja principal */
+.login {
+    background-color: white;
+    width: 100%;
+    max-width: 420px;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Logo y título */
+.logo {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.logo h1 {
+    color: #218c55;
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.logo p {
+    color: #777;
+    font-size: 13px;
+}
+
+.login h2 {
+    color: #222;
+    font-size: 23px;
+    margin-bottom: 8px;
+}
+
+.subtitulo {
+    color: #777;
+    margin-bottom: 25px;
+}
+
+/* Campos */
+.campo {
+    margin-bottom: 20px;
+}
+
+.campo label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.campo input {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    font-size: 14px;
+}
+
+.campo input:focus {
+    outline: none;
+    border-color: #218c55;
+}
+
+/* Opciones */
+.opciones {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    margin-bottom: 25px;
+    gap: 10px;
+}
+
+.opciones a,
+.registro a {
+    color: #218c55;
+    text-decoration: none;
+}
+
+.opciones a:hover,
+.registro a:hover {
+    text-decoration: underline;
+}
+
+/* Botón */
+button {
+    width: 100%;
+    padding: 14px;
+    background-color: #218c55;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #176b40;
+}
+
+/* Registro */
+.registro {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 13px;
+    color: #666;
+}
+
+/* Adaptación a móviles */
+@media (max-width: 480px) {
+    .login {
+        padding: 25px;
+    }
+
+    .opciones {
+        flex-wrap: wrap;
+    }
+}
