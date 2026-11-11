@@ -8,6 +8,7 @@ var crypto = require('crypto');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var db = require('./routes/conexion');
 var mensajesRouter = require('./routes/mensajes');
 
 
@@ -32,6 +33,11 @@ app.use(session({
   }
 }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(function(req, res, next) {
+  db.ready.then(function() {
+    next();
+  }).catch(next);
+});
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

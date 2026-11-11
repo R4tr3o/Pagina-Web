@@ -3,17 +3,28 @@ extends layout
 block content
   h1 Panel de administración
   p La sesión de administrador está iniciada.
-  p La gestión de usuarios todavía no está conectada a la base de datos.
+  if notice
+    p(role='status')= notice
+  if error
+    p(role='alert')= error
 
   section
     h2 Dar de alta un usuario
     form(method='POST', action='/panel/alta-usuario')
-      input(type='email', name='email', placeholder='Correo electrónico', required)
-      input(type='password', name='password', placeholder='Contraseña', required)
+      label(for='usuario') Usuario:
+      input#usuario(type='text', name='usuario', maxlength='40', required)
+      label(for='nombre') Nombre completo:
+      input#nombre(type='text', name='nombre', maxlength='100', required)
+      label(for='password') Contraseña (mínimo 8 caracteres):
+      input#password(type='password', name='password', minlength='8', required)
       select(name='rol')
         option(value='usuario') Usuario normal
         option(value='admin') Administrador
-      input(type='number', name='id_grupo', placeholder='ID del grupo', required)
+      label(for='id_grupo') Grupo (opcional):
+      select#id_grupo(name='id_grupo')
+        option(value='') Sin grupo
+        each grupo in grupos
+          option(value=grupo.id_grupo)= grupo.nombre
       button(type='submit') Crear usuario
 
   section
@@ -21,8 +32,8 @@ block content
     table(border='1', cellpadding='5')
       thead
         tr
-          th ID
-          th Email
+          th Usuario
+          th Nombre
           th Rol
           th Grupo
           th Acciones
@@ -30,13 +41,13 @@ block content
         if usuarios.length
           each usuario in usuarios
             tr
-              td= usuario.id
-              td= usuario.email
-              td= usuario.rol
-              td= usuario.id_grupo
+              td= usuario.usuario
+              td= usuario.nombre
+              td= usuario.admin ? 'Administrador' : 'Usuario'
+              td= usuario.nombre_grupo || 'Sin grupo'
               td
-                form(method='POST', action='/panel/baja-usuario/' + usuario.id)
+                form(method='POST', action='/panel/baja-usuario/' + encodeURIComponent(usuario.usuario))
                   button(type='submit', style='color: red') Borrar
         else
           tr
-            td(colspan='5') No hay usuarios para mostrar.
+            td(colspan='5') No hay usuarios registrados.
