@@ -32,6 +32,11 @@ app.use(session({
     secure: app.get('env') === 'production'
   }
 }));
+app.use(function(req, res, next) {
+  res.locals.usuarioSesion = req.session.usuarioId || null;
+  res.locals.rolSesion = req.session.rol || null;
+  next();
+});
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(function(req, res, next) {
   db.ready.then(function() {

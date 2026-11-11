@@ -2,6 +2,8 @@ extends layout
 
 block content
   h1 Iniciar sesión
+  if error
+    p(role='alert')= error
   form(method='POST', action='/users/login')
     div
       label(for='usuario') Usuario:

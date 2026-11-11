@@ -5,9 +5,16 @@ html
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
     nav
-      a(href='/') Inicio
-      |  |
-      a(href='/login') Iniciar sesión
-      |  |
-      a(href='/panel') Panel
+      if usuarioSesion
+        a(href='/') Inicio
+        |  |
+        a(href='/mensajes') Chat
+        if rolSesion === 'admin'
+          |  |
+          a(href='/panel') Panel
+        |  |
+        form(method='POST', action='/users/logout', style='display:inline')
+          button(type='submit') Cerrar sesión
+      else
+        a(href='/login') Iniciar sesión
     block content

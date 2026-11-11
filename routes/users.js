@@ -28,7 +28,7 @@ router.post('/login', async (req, res, next) => {
             usuario === adminUsername && password === adminPassword;
 
         if (!contraseñaValida && !administradorDePrueba) {
-            return res.status(401).send('Usuario o contraseña incorrectos.');
+            return res.redirect('/login?error=credenciales');
         }
 
         req.session.regenerate((err) => {
@@ -36,11 +36,19 @@ router.post('/login', async (req, res, next) => {
             req.session.usuarioId = contraseñaValida ? cuenta.usuario : adminUsername;
             req.session.rol = contraseñaValida && cuenta.admin ? 'admin' : 'usuario';
             if (administradorDePrueba) req.session.rol = 'admin';
-            res.redirect(req.session.rol === 'admin' ? '/panel' : '/');
+            res.redirect('/');
         });
     } catch (err) {
         next(err);
     }
+});
+
+router.post('/logout', (req, res, next) => {
+    req.session.destroy((err) => {
+        if (err) return next(err);
+        res.clearCookie('connect.sid');
+        res.redirect('/login');
+    });
 });
 
 module.exports = router;

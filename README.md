@@ -20,6 +20,8 @@ La aplicación guarda los datos en `routes/BBDD.db`. Al arrancar, crea las tabla
 - El panel permite crear cuentas con usuario, nombre, contraseña y rol. Las contraseñas nuevas se guardan como hashes bcrypt.
 - Los grupos son opcionales al crear una cuenta. Para asignarlos, debe existir previamente el grupo en la tabla `grupo`.
 - Las cuentas existentes sin `password_hash` se conservan, pero no pueden iniciar sesión con contraseña hasta que se les asigne una.
+- Después de iniciar sesión, todos los usuarios llegan a la página de inicio. Desde allí acceden al chat de su grupo y los administradores también al panel. Los mensajes se publican con el usuario de la sesión, y un usuario no puede leer ni escribir en el chat de otro grupo.
+- Si las credenciales no son correctas, se vuelve al login y se muestra un aviso. El menú también permite cerrar sesión.
 
 En PowerShell, ejecuta una vez, cambiando la contraseña por una propia:
 

@@ -3,10 +3,13 @@ var router = express.Router();
 var bcrypt = require('bcrypt');
 var db = require('./conexion');
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+function requiereSesion(req, res, next) {
+    if (!req.session.usuarioId) {
+        return res.redirect('/login');
+    }
+
+    next();
+}
 
 function soloAdmin(req, res, next) {
     if (!req.session.usuarioId) {
@@ -20,7 +23,37 @@ function soloAdmin(req, res, next) {
     next();
 }
 router.get('/login', (req, res) => {
-    res.render('login', { title: 'Iniciar sesión' });
+    if (req.session.usuarioId) {
+        return res.redirect('/');
+    }
+
+    res.render('login', {
+        title: 'Iniciar sesión',
+        error: req.query.error === 'credenciales'
+            ? 'Usuario o contraseña incorrectos.'
+            : null
+    });
+});
+
+router.get('/', requiereSesion, async (req, res, next) => {
+    try {
+        const cuenta = await db.getAsync(
+            `SELECT usuarios.usuario, usuarios.nombre, usuarios.admin,
+                    grupo.id_grupo, grupo.nombre AS nombre_grupo
+             FROM usuarios
+             LEFT JOIN grupo ON grupo.id_grupo = usuarios.id_grupo
+             WHERE usuarios.usuario = ?`,
+            [req.session.usuarioId]
+        );
+
+        res.render('inicio', {
+            title: 'Inicio',
+            usuario: cuenta,
+            admin: req.session.rol === 'admin'
+        });
+    } catch (err) {
+        next(err);
+    }
 });
 
 router.get('/panel', soloAdmin, async (req, res, next) => {
