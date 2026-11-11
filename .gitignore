@@ -62,3 +62,6 @@ typings/
 
 #Base de datos
 BBDD.db
+
+# Local database
+BBDD.db
