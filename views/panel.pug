@@ -1,0 +1,42 @@
+extends layout
+
+block content
+  h1 Panel de administración
+  p La sesión de administrador está iniciada.
+  p La gestión de usuarios todavía no está conectada a la base de datos.
+
+  section
+    h2 Dar de alta un usuario
+    form(method='POST', action='/panel/alta-usuario')
+      input(type='email', name='email', placeholder='Correo electrónico', required)
+      input(type='password', name='password', placeholder='Contraseña', required)
+      select(name='rol')
+        option(value='usuario') Usuario normal
+        option(value='admin') Administrador
+      input(type='number', name='id_grupo', placeholder='ID del grupo', required)
+      button(type='submit') Crear usuario
+
+  section
+    h2 Usuarios registrados
+    table(border='1', cellpadding='5')
+      thead
+        tr
+          th ID
+          th Email
+          th Rol
+          th Grupo
+          th Acciones
+      tbody
+        if usuarios.length
+          each usuario in usuarios
+            tr
+              td= usuario.id
+              td= usuario.email
+              td= usuario.rol
+              td= usuario.id_grupo
+              td
+                form(method='POST', action='/panel/baja-usuario/' + usuario.id)
+                  button(type='submit', style='color: red') Borrar
+        else
+          tr
+            td(colspan='5') No hay usuarios para mostrar.
