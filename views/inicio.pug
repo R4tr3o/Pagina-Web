@@ -1,16 +1,48 @@
 extends layout
 
 block content
-  h1 Bienvenido#{usuario ? ', ' + usuario.nombre : ''}
-  p Has iniciado sesión correctamente.
+  section.welcome-hero.surface-card.p-4.p-md-5.mb-4
+    p.page-kicker Tu espacio de trabajo
+    .welcome-identity
+      if usuario
+        span.welcome-avatar
+          if usuario.fotoUrl
+            img(src=usuario.fotoUrl, alt='', onerror='this.nextElementSibling.hidden = false; this.remove()')
+            span.welcome-avatar-initial(aria-hidden='true', hidden)= usuario.nombre.charAt(0).toUpperCase()
+          else
+            span.welcome-avatar-initial(aria-hidden='true')= usuario.nombre.charAt(0).toUpperCase()
+      h1.page-title= usuario ? 'Hola, ' + usuario.nombre : 'Bienvenido, administrador'
+    p.page-subtitle.mb-3 Has iniciado sesión correctamente. Todo lo que necesitas para tu equipo está aquí.
+    if usuario && usuario.nombre_grupo
+      span.badge.rounded-pill.px-3.py-2 Grupo · #{usuario.nombre_grupo}
+    else if usuario
+      span.badge.rounded-pill.px-3.py-2 Aún no tienes un grupo asignado
 
-  if usuario && usuario.id_grupo
-    p Grupo: #{usuario.nombre_grupo}
-    p
-      a(href='/mensajes') Entrar al chat de mi grupo
-  else
-    p Tu cuenta todavía no tiene un grupo asignado, así que no puedes acceder a un chat.
-
-  if admin
-    p
-      a(href='/panel') Ir al panel de administración
+  .row.g-4
+    if usuario && usuario.id_grupo
+      .col-md-6
+        a.action-card.h-100(href='/mensajes')
+          span.action-icon.teal(aria-hidden='true') C
+          div
+            h2 Chat del grupo
+            p Entra en la conversación de #{usuario.nombre_grupo} y comparte novedades con tu equipo.
+    else
+      .col-md-6
+        .action-card.h-100
+          span.action-icon.teal(aria-hidden='true') C
+          div
+            h2 Chat del grupo
+            p Cuando tengas un grupo asignado, aquí podrás acceder a su chat.
+    if admin
+      .col-md-6
+        a.action-card.h-100(href='/panel')
+          span.action-icon(aria-hidden='true') A
+          div
+            h2 Panel de administración
+            p Gestiona usuarios, roles y grupos desde un solo lugar.
+    .col-md-6
+      a.action-card.h-100(href='/cambiar-contrasena')
+        span.action-icon(aria-hidden='true') S
+        div
+          h2 Seguridad de la cuenta
+          p Actualiza tu contraseña cuando lo necesites.

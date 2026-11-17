@@ -1,22 +1,50 @@
 doctype html
-html
+html(lang='es')
   head
-    title= title
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    title= title || 'Conecta'
+    link(rel='stylesheet', href='/vendor/bootstrap/css/bootstrap.min.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
-    nav
-      if usuarioSesion
-        a(href='/') Inicio
-        |  |
-        a(href='/mensajes') Chat
-        |  |
-        a(href='/cambiar-contrasena') Cambiar contraseña
-        if rolSesion === 'admin'
-          |  |
-          a(href='/panel') Panel
-        |  |
-        form(method='POST', action='/users/logout', style='display:inline')
-          button(type='submit') Cerrar sesión
-      else
-        a(href='/login') Iniciar sesión
-    block content
+    nav.navbar.navbar-expand-lg.navbar-dark.app-navbar
+      .container
+        a.navbar-brand.d-flex.align-items-center.gap-2(href='/')
+          span.brand-mark C
+          span.brand-name Conecta
+        if usuarioSesion
+          button.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#mainNavigation', aria-controls='mainNavigation', aria-expanded='false', aria-label='Abrir navegación')
+            span.navbar-toggler-icon
+          #mainNavigation.collapse.navbar-collapse
+            ul.navbar-nav.me-auto.ms-lg-4
+              li.nav-item
+                a.nav-link(href='/inicio') Mi espacio
+              li.nav-item
+                a.nav-link(href='/mensajes') Chat
+              if rolSesion === 'admin'
+                li.nav-item
+                  a.nav-link(href='/panel') Administración
+              li.nav-item
+                a.nav-link(href='/cambiar-contrasena') Contraseña
+            .navbar-account
+              span.account-avatar
+                if usuarioFotoUrl
+                  img.account-photo(src=usuarioFotoUrl, alt='', onerror='this.nextElementSibling.hidden = false; this.remove()')
+                  span.account-initial(aria-hidden='true', hidden)= String(usuarioSesion).charAt(0).toUpperCase()
+                else
+                  span.account-initial(aria-hidden='true')= String(usuarioSesion).charAt(0).toUpperCase()
+              span.account-name= usuarioSesion
+              form(method='POST', action='/users/logout')
+                button.btn.btn-sm.btn-outline-light(type='submit') Cerrar sesión
+        else
+          a.btn.btn-sm.btn-outline-light.ms-auto(href='/login') Iniciar sesión
+
+    main.container.app-main.py-4.py-lg-5
+      block content
+
+    footer.app-footer
+      .container.d-flex.flex-column.flex-sm-row.justify-content-between.gap-2
+        span Conecta · Tu equipo, más cerca
+        span Un espacio para colaborar y compartir
+
+    script(src='/vendor/bootstrap/js/bootstrap.bundle.min.js' defer)

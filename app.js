@@ -10,6 +10,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var db = require('./routes/conexion');
 var mensajesRouter = require('./routes/mensajes');
+var fotos = require('./routes/fotos');
 
 
 var app = express();
@@ -35,11 +36,24 @@ app.use(session({
 app.use(function(req, res, next) {
   res.locals.usuarioSesion = req.session.usuarioId || null;
   res.locals.rolSesion = req.session.rol || null;
+  res.locals.usuarioFotoUrl = null;
   next();
 });
+app.use('/vendor/bootstrap', express.static(path.join(__dirname, 'node_modules', 'bootstrap', 'dist')));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(function(req, res, next) {
   db.ready.then(function() {
+    next();
+  }).catch(next);
+});
+app.use(function(req, res, next) {
+  if (!req.session.usuarioId) return next();
+
+  db.getAsync(
+    'SELECT foto FROM usuarios WHERE usuario = ?',
+    [req.session.usuarioId]
+  ).then((cuenta) => {
+    res.locals.usuarioFotoUrl = fotos.urlFoto(cuenta && cuenta.foto);
     next();
   }).catch(next);
 });

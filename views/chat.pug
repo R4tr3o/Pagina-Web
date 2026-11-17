@@ -1,21 +1,45 @@
 extends layout
 
 block content
-  h1 Chat: #{nombre_grupo}
+  .d-flex.flex-column.flex-sm-row.justify-content-between.align-items-sm-end.gap-3.mb-4
+    div
+      p.page-kicker Conversación de grupo
+      h1.page-title.mb-1= nombre_grupo
+      p.page-subtitle Comparte ideas y novedades con las personas de tu equipo.
+    span.badge.rounded-pill.bg-white.text-dark.border.px-3.py-2 Chat privado del grupo
 
-  .chat-box(style="border: 1px solid #ccc; padding: 15px; height: 300px; overflow-y: scroll; background: #f9f9f9;")
-    each msg in mensajes
-      p
-        strong= msg.usuario + ': '
-        span= msg.texto
-        small(style="color: gray; margin-left: 10px;") #{msg.fecha_hora}
-    else
-      p No hay mensajes todavía en este grupo. ¡Sé el primero en escribir!
+  section.chat-card
+    header.chat-header.d-flex.justify-content-between.align-items-center
+      div
+        h2.section-title.mb-1 Chat de #{nombre_grupo}
+        p.section-description.mb-0 Los mensajes solo son visibles para los miembros del grupo.
+      span.action-icon.teal(aria-hidden='true') C
+    #chatWindow.chat-window(role='log', aria-live='polite', aria-relevant='additions')
+      each msg in mensajes
+        article.chat-message(class=msg.usuario === usuarioSesion ? 'is-own' : '')
+          span.chat-avatar
+            if msg.fotoUrl
+              img.chat-avatar-image(src=msg.fotoUrl, alt='', onerror='this.nextElementSibling.hidden = false; this.remove()')
+              span.chat-avatar-initial(aria-hidden='true', hidden)= msg.usuario.charAt(0).toUpperCase()
+            else
+              span.chat-avatar-initial(aria-hidden='true')= msg.usuario.charAt(0).toUpperCase()
+          div.chat-bubble
+            .chat-message-meta
+              strong= msg.usuario
+              time= msg.fecha_hora
+            p.chat-message-text= msg.texto
+      else
+        p.text-center.text-muted.my-auto Aún no hay mensajes. ¡Empieza la conversación!
+    .chat-compose
+      form(action='/mensajes/enviar', method='POST')
+        input(type='hidden', name='id_grupo', value=id_grupo)
+        .row.g-2.align-items-end
+          .col
+            label.visually-hidden(for='texto-mensaje') Escribe un mensaje
+            textarea#texto-mensaje.form-control(name='texto', required, maxlength='2000', placeholder='Escribe un mensaje para tu grupo...', rows='2')
+          .col-auto
+            button.btn.btn-primary(type='submit') Enviar
 
-  hr
-  h3 Enviar Mensaje
-  form(action="/mensajes/enviar" method="POST")
-    input(type="hidden" name="id_grupo" value=id_grupo)
-    textarea(name="texto" required placeholder="Escribe tu mensaje aquí..." rows="3" cols="40")
-    br
-    button(type="submit") Enviar Mensaje
+  script.
+    const chatWindow = document.getElementById('chatWindow');
+    chatWindow.scrollTop = chatWindow.scrollHeight;

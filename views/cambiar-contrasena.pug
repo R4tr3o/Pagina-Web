@@ -1,22 +1,26 @@
 extends layout
 
 block content
-  h1 Cambiar contraseña
-  if error
-    p(role='alert')= error
-  if notice
-    p(role='status')= notice
-  form(method='POST', action='/cambiar-contrasena')
-    div
-      label(for='passwordActual') Contraseña actual:
-      input#passwordActual(type='password', name='passwordActual', required, autocomplete='current-password')
-    br
-    div
-      label(for='passwordNueva') Nueva contraseña:
-      input#passwordNueva(type='password', name='passwordNueva', required, minlength='8', autocomplete='new-password')
-    br
-    div
-      label(for='confirmarPassword') Confirmar nueva contraseña:
-      input#confirmarPassword(type='password', name='confirmarPassword', required, minlength='8', autocomplete='new-password')
-    br
-    button(type='submit') Guardar contraseña
+  .row.justify-content-center
+    .col-lg-8.col-xl-7
+      .mb-4
+        p.page-kicker Ajustes de cuenta
+        h1.page-title Cambia tu contraseña
+        p.page-subtitle Refuerza la seguridad de tu cuenta con una contraseña nueva.
+      .content-card
+        if error
+          .alert.alert-danger(role='alert')= error
+        if notice
+          .alert.alert-success(role='status')= notice
+        form(method='POST', action='/cambiar-contrasena')
+          .mb-3
+            label.form-label(for='passwordActual') Contraseña actual
+            input#passwordActual.form-control(type='password', name='passwordActual', required, autocomplete='current-password')
+          .mb-3
+            label.form-label(for='passwordNueva') Nueva contraseña
+            input#passwordNueva.form-control(type='password', name='passwordNueva', required, minlength='8', autocomplete='new-password')
+            .form-text Al menos 8 caracteres.
+          .mb-4
+            label.form-label(for='confirmarPassword') Confirma la nueva contraseña
+            input#confirmarPassword.form-control(type='password', name='confirmarPassword', required, minlength='8', autocomplete='new-password')
+          button.btn.btn-primary(type='submit') Guardar contraseña

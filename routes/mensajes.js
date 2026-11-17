@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('./conexion');
+const fotos = require('./fotos');
 
 router.use((req, res, next) => {
     if (!req.session.usuarioId) {
@@ -45,13 +46,21 @@ router.get('/:id_grupo', async (req, res, next) => {
         const [grupo, mensajes] = await Promise.all([
             db.getAsync('SELECT nombre FROM grupo WHERE id_grupo = ?', [idGrupo]),
             db.allAsync(
-                'SELECT usuario, texto, fecha_hora FROM mensajes WHERE id_grupo = ? ORDER BY fecha_hora ASC',
+                `SELECT mensajes.usuario, usuarios.foto, mensajes.texto, mensajes.fecha_hora
+                 FROM mensajes
+                 JOIN usuarios ON usuarios.usuario = mensajes.usuario
+                 WHERE mensajes.id_grupo = ?
+                 ORDER BY mensajes.fecha_hora ASC`,
                 [idGrupo]
             )
         ]);
         if (!grupo) {
             return res.status(404).send('Grupo no encontrado.');
         }
+
+        mensajes.forEach((mensaje) => {
+            mensaje.fotoUrl = fotos.urlFoto(mensaje.foto);
+        });
 
         res.render('chat', {
             title: `Chat de ${grupo.nombre}`,
