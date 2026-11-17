@@ -65,6 +65,9 @@ db.ready = (async () => {
     if (!columns.some((column) => column.name === 'password_hash')) {
         await db.runAsync('ALTER TABLE usuarios ADD COLUMN password_hash TEXT');
     }
+    if (!columns.some((column) => column.name === 'foto')) {
+        await db.runAsync('ALTER TABLE usuarios ADD COLUMN foto TEXT');
+    }
 
     if (process.env.SEED_SAMPLE_DATA !== 'true') {
         return;

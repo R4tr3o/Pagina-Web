@@ -13,10 +13,11 @@ router.post('/login', async (req, res, next) => {
     const password = typeof req.body.password === 'string' ? req.body.password : '';
 
     try {
-        const cuenta = await db.getAsync(
-            'SELECT usuario, password_hash, admin FROM usuarios WHERE usuario = ?',
+        const cuentas = await db.allAsync(
+            'SELECT usuario, password_hash, admin FROM usuarios WHERE usuario COLLATE NOCASE = ?',
             [usuario]
         );
+        const cuenta = cuentas.length === 1 ? cuentas[0] : null;
         const contraseñaValida = cuenta && cuenta.password_hash
             ? await bcrypt.compare(password, cuenta.password_hash)
             : false;
@@ -24,8 +25,8 @@ router.post('/login', async (req, res, next) => {
             (process.env.NODE_ENV === 'production' ? '' : 'admin');
         const adminPassword = process.env.ADMIN_PASSWORD ||
             (process.env.NODE_ENV === 'production' ? '' : '1234');
-        const administradorDePrueba = !cuenta && adminUsername && adminPassword &&
-            usuario === adminUsername && password === adminPassword;
+        const administradorDePrueba = cuentas.length === 0 && adminUsername && adminPassword &&
+            usuario.toLowerCase() === adminUsername.toLowerCase() && password === adminPassword;
 
         if (!contraseñaValida && !administradorDePrueba) {
             return res.redirect('/login?error=credenciales');
@@ -36,7 +37,7 @@ router.post('/login', async (req, res, next) => {
             req.session.usuarioId = contraseñaValida ? cuenta.usuario : adminUsername;
             req.session.rol = contraseñaValida && cuenta.admin ? 'admin' : 'usuario';
             if (administradorDePrueba) req.session.rol = 'admin';
-            res.redirect('/');
+            res.redirect('/inicio');
         });
     } catch (err) {
         next(err);

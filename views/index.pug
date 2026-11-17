@@ -1,5 +1,75 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  section.landing-hero.mb-5
+    .row.g-0.align-items-center
+      .col-lg-7
+        .landing-copy
+          span.landing-pill Un equipo conectado llega más lejos
+          p.page-kicker.mt-4 Conecta · Sobre nosotros
+          h1.landing-title El trabajo en equipo empieza por estar conectados.
+          p.landing-lead Reúne a tu grupo, comparte ideas y mantén cada conversación en el mismo lugar. Conecta hace más fácil avanzar juntos.
+          .d-flex.flex-column.flex-sm-row.align-items-sm-center.gap-3.mt-4
+            a.btn.btn-light.btn-lg.landing-primary(href='/login') Iniciar sesión
+            a.btn.btn-link.text-white.text-decoration-none(href='#sobre-conecta') Conoce Conecta
+          p.landing-caption.mt-4 Un espacio sencillo para colaborar mejor, cada día.
+      .col-lg-5
+        .landing-visual(aria-hidden='true')
+          .visual-orbit.visual-orbit-one
+          .visual-orbit.visual-orbit-two
+          .team-card.team-card-main
+            .d-flex.align-items-center.gap-3
+              span.visual-avatar.visual-avatar-purple D
+              div
+                strong Equipo de Desarrollo
+                p.mb-0.small.text-secondary Una conversación para todos
+              span.visual-status
+            hr
+            .visual-message
+              span.visual-avatar.visual-avatar-teal M
+              p.mb-0 ¡Gran trabajo! Ya tenemos las ideas para el siguiente paso.
+            .visual-members
+              span.visual-avatar.visual-avatar-purple A
+              span.visual-avatar.visual-avatar-coral J
+              span.visual-avatar.visual-avatar-teal M
+              span.visual-members-label El equipo avanza unido
+          .team-card.team-card-note
+            span.note-mark +
+            span Nuevas ideas, un mismo objetivo
+
+  section#sobre-conecta.landing-about.row.g-4.g-lg-5.align-items-center.mb-5
+    .col-lg-5
+      p.page-kicker Nuestra idea
+      h2.landing-section-title Las mejores ideas aparecen cuando colaboramos.
+    .col-lg-7
+      p.landing-about-copy Conecta nace para acercar a las personas que trabajan por un objetivo común. Cada equipo tiene su propio espacio para conversar, compartir ideas y construir soluciones en conjunto.
+      p.landing-about-copy.mb-0 Creemos que colaborar debería ser fácil: un lugar claro para cada grupo, conversaciones accesibles y una comunidad que avanza unida.
+
+  section.mb-5
+    .d-flex.flex-column.flex-md-row.justify-content-between.align-items-md-end.gap-3.mb-4
+      div
+        p.page-kicker Lo que nos une
+        h2.landing-section-title.mb-0 Un lugar para hacer equipo.
+      p.page-subtitle.landing-section-aside.mb-0 Todo lo importante para colaborar, sin complicaciones.
+    .row.g-3
+      .col-md-4
+        article.feature-card.h-100
+          span.feature-icon.feature-icon-purple C
+          h3 Conversaciones con propósito
+          p Cada grupo tiene su chat para compartir ideas y mantener el diálogo cerca del trabajo.
+      .col-md-4
+        article.feature-card.h-100
+          span.feature-icon.feature-icon-teal E
+          h3 Equipos más conectados
+          p Organiza a las personas por grupos y facilita que todos sepan dónde participar.
+      .col-md-4
+        article.feature-card.h-100
+          span.feature-icon.feature-icon-coral A
+          h3 Una comunidad que avanza
+          p Cuando cada persona aporta, los objetivos comunes se vuelven más fáciles de alcanzar.
+
+  section.landing-cta.text-center
+    p.page-kicker Tu próximo paso
+    h2.landing-section-title Conecta con tu equipo.
+    p.page-subtitle.mb-4 Comparte, colabora y construye algo mejor, juntos.
+    a.btn.btn-primary.btn-lg(href='/login') Iniciar sesión

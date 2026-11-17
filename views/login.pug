@@ -1,16 +1,28 @@
 extends layout
 
 block content
-  h1 Iniciar sesión
-  if error
-    p(role='alert')= error
-  form(method='POST', action='/users/login')
-    div
-      label(for='usuario') Usuario:
-      input#usuario(type='text', name='usuario', required)
-    br
-    div
-      label(for='password') Contraseña:
-      input#password(type='password', name='password', required)
-    br
-    button(type='submit') Entrar
+  .auth-shell
+    .auth-card.row.g-0
+      .col-lg-5.d-none.d-lg-block
+        .auth-visual
+          .auth-visual-content
+            p.page-kicker Un espacio para tu equipo
+            h2 Conecta, comparte y avanza.
+            p Accede a las conversaciones y herramientas de tu grupo en un solo lugar.
+          .auth-visual-footer Un lugar para trabajar mejor, juntos.
+      .col-lg-7
+        .auth-form-panel
+          p.page-kicker Bienvenido de nuevo
+          h1 Inicia sesión
+          p.page-subtitle.mb-4 Introduce tus credenciales para entrar en tu espacio.
+          if error
+            .alert.alert-danger(role='alert')= error
+          form(method='POST', action='/users/login')
+            .mb-3
+              label.form-label(for='usuario') Usuario
+              input#usuario.form-control.form-control-lg(type='text', name='usuario', required, autocomplete='username', autofocus)
+            .mb-4
+              label.form-label(for='password') Contraseña
+              input#password.form-control.form-control-lg(type='password', name='password', required, autocomplete='current-password')
+            button.btn.btn-primary.btn-lg.w-100(type='submit') Entrar en mi cuenta
+          p.auth-footnote Tu espacio de equipo, protegido y privado.

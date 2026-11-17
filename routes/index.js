@@ -1,7 +1,55 @@
 var express = require('express');
 var router = express.Router();
 var bcrypt = require('bcrypt');
+var crypto = require('crypto');
+var fs = require('fs');
+var multer = require('multer');
+var path = require('path');
 var db = require('./conexion');
+var fotos = require('./fotos');
+var avatarDirectory = process.env.AVATAR_DIR
+    ? path.resolve(process.env.AVATAR_DIR)
+    : path.join(__dirname, '..', 'uploads', 'avatars');
+var uploadFoto = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        files: 1,
+        fileSize: 2 * 1024 * 1024
+    }
+});
+
+function extensionFoto(buffer, mimeType) {
+    if (mimeType === 'image/jpeg' &&
+        buffer.length >= 3 &&
+        buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+        return 'jpg';
+    }
+    if (mimeType === 'image/png' &&
+        buffer.length >= 8 &&
+        buffer.subarray(0, 8).equals(Buffer.from('89504e470d0a1a0a', 'hex'))) {
+        return 'png';
+    }
+    if (mimeType === 'image/webp' &&
+        buffer.length >= 12 &&
+        buffer.toString('ascii', 0, 4) === 'RIFF' &&
+        buffer.toString('ascii', 8, 12) === 'WEBP') {
+        return 'webp';
+    }
+    return null;
+}
+
+function procesarCargaFoto(req, res, next) {
+    uploadFoto.single('foto')(req, res, (err) => {
+        if (!err) return next();
+        if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
+            return res.redirect('/panel?error=photoSize');
+        }
+        if (err instanceof multer.MulterError && err.code === 'LIMIT_UNEXPECTED_FILE') {
+            return res.redirect('/panel?error=photoType');
+        }
+        next(err);
+    });
+}
 
 function requiereSesion(req, res, next) {
     if (!req.session.usuarioId) {
@@ -36,7 +84,7 @@ function soloAdmin(req, res, next) {
 }
 router.get('/login', (req, res) => {
     if (req.session.usuarioId) {
-        return res.redirect('/');
+        return res.redirect('/inicio');
     }
 
     res.render('login', {
@@ -47,16 +95,54 @@ router.get('/login', (req, res) => {
     });
 });
 
-router.get('/', requiereSesion, async (req, res, next) => {
+router.get('/', (req, res) => {
+    res.render('index', {
+        title: 'Conecta | Trabajo en equipo'
+    });
+});
+
+router.get('/avatars/:filename', requiereSesion, async (req, res, next) => {
+    const filename = req.params.filename;
+    if (!fotos.fotoGestionada(filename)) {
+        return res.sendStatus(404);
+    }
+
+    try {
+        const foto = await db.getAsync(
+            'SELECT usuario FROM usuarios WHERE foto = ?',
+            [filename]
+        );
+        if (!foto) {
+            return res.sendStatus(404);
+        }
+
+        res.set('Cache-Control', 'private, max-age=3600');
+        res.set('X-Content-Type-Options', 'nosniff');
+        res.sendFile(path.join(avatarDirectory, filename), (err) => {
+            if (!err) return;
+            if (err.code === 'ENOENT' && !res.headersSent) {
+                return res.sendStatus(404);
+            }
+            next(err);
+        });
+    } catch (err) {
+        next(err);
+    }
+});
+
+router.get('/inicio', requiereSesion, async (req, res, next) => {
     try {
         const cuenta = await db.getAsync(
-            `SELECT usuarios.usuario, usuarios.nombre, usuarios.admin,
+            `SELECT usuarios.usuario, usuarios.nombre, usuarios.admin, usuarios.foto,
                     grupo.id_grupo, grupo.nombre AS nombre_grupo
              FROM usuarios
              LEFT JOIN grupo ON grupo.id_grupo = usuarios.id_grupo
              WHERE usuarios.usuario = ?`,
             [req.session.usuarioId]
         );
+        if (cuenta) {
+            cuenta.fotoUrl = fotos.urlFoto(cuenta.foto);
+        }
 
         res.render('inicio', {
             title: 'Inicio',
@@ -130,17 +216,29 @@ router.post('/cambiar-contrasena', requiereSesion, async (req, res, next) => {
 router.get('/panel', soloAdmin, async (req, res, next) => {
     try {
         const [usuarios, grupos] = await Promise.all([
-        db.allAsync(`
-            SELECT usuarios.usuario, usuarios.nombre, usuarios.id_grupo,
-                   usuarios.admin, grupo.nombre AS nombre_grupo
-            FROM usuarios
-            LEFT JOIN grupo ON grupo.id_grupo = usuarios.id_grupo
-            ORDER BY usuarios.usuario
-        `),
-        db.allAsync('SELECT id_grupo, nombre FROM grupo ORDER BY nombre')
+            db.allAsync(`
+                SELECT usuarios.usuario, usuarios.nombre, usuarios.foto, usuarios.id_grupo,
+                       usuarios.admin, grupo.nombre AS nombre_grupo
+                FROM usuarios
+                LEFT JOIN grupo ON grupo.id_grupo = usuarios.id_grupo
+                ORDER BY usuarios.usuario
+            `),
+            db.allAsync(`
+                SELECT grupo.id_grupo, grupo.nombre, COUNT(usuarios.usuario) AS miembros
+                FROM grupo
+                LEFT JOIN usuarios ON usuarios.id_grupo = grupo.id_grupo
+                GROUP BY grupo.id_grupo, grupo.nombre
+                ORDER BY grupo.nombre
+            `)
         ]);
+        usuarios.forEach((usuario) => {
+            usuario.fotoUrl = fotos.urlFoto(usuario.foto);
+        });
         const notices = {
             created: 'Usuario creado correctamente.',
+            photoUpdated: 'Foto de usuario actualizada correctamente.',
+            groupCreated: 'Grupo creado correctamente.',
+            groupDeleted: 'Grupo eliminado correctamente.',
             updated: 'Usuario actualizado correctamente.',
             deleted: 'Usuario eliminado correctamente.'
         };
@@ -148,6 +246,14 @@ router.get('/panel', soloAdmin, async (req, res, next) => {
             invalid: 'Revisa los datos: usuario, nombre, contraseña, rol o grupo no válidos.',
             duplicate: 'Ya existe un usuario con ese nombre.',
             group: 'El grupo seleccionado no existe.',
+            groupInvalid: 'El nombre del grupo debe tener entre 1 y 50 caracteres.',
+            groupDuplicate: 'Ya existe un grupo con ese nombre.',
+            groupMissing: 'El grupo que intentas borrar ya no existe.',
+            groupInUse: 'No se puede borrar el grupo mientras tenga usuarios asignados.',
+            photoRequired: 'Selecciona una imagen para subir.',
+            photoType: 'La imagen debe ser JPG, PNG o WebP válida.',
+            photoSize: 'La imagen no puede superar los 2 MB.',
+            photoUserMissing: 'El usuario cuya foto intentas cambiar ya no existe.',
             missing: 'El usuario que intentas eliminar ya no existe.',
             lastAdmin: 'Debe quedar al menos un administrador en el sistema.',
             self: 'No puedes eliminar tu propia cuenta.',
@@ -161,6 +267,119 @@ router.get('/panel', soloAdmin, async (req, res, next) => {
             notice: notices[req.query.notice] || null,
             error: errors[req.query.error] || null
         });
+    } catch (err) {
+        next(err);
+    }
+});
+
+router.post('/panel/foto/:usuario', soloAdmin, procesarCargaFoto, async (req, res, next) => {
+    if (!req.file) {
+        return res.redirect('/panel?error=photoRequired');
+    }
+
+    const extension = extensionFoto(req.file.buffer, req.file.mimetype);
+    if (!extension) {
+        return res.redirect('/panel?error=photoType');
+    }
+
+    try {
+        const cuenta = await db.getAsync(
+            'SELECT foto FROM usuarios WHERE usuario = ?',
+            [req.params.usuario]
+        );
+        if (!cuenta) {
+            return res.redirect('/panel?error=photoUserMissing');
+        }
+
+        await fs.promises.mkdir(avatarDirectory, { recursive: true });
+        const filename = `${crypto.randomBytes(16).toString('hex')}.${extension}`;
+        const fotoPath = path.join(avatarDirectory, filename);
+        await fs.promises.writeFile(fotoPath, req.file.buffer, { flag: 'wx' });
+
+        let resultado;
+        try {
+            resultado = await db.runAsync(
+                'UPDATE usuarios SET foto = ? WHERE usuario = ?',
+                [filename, req.params.usuario]
+            );
+        } catch (err) {
+            try {
+                await fs.promises.unlink(fotoPath);
+            } catch (cleanupError) {
+                if (cleanupError.code !== 'ENOENT') {
+                    console.error('Error al limpiar una foto no guardada:', cleanupError);
+                }
+            }
+            return next(err);
+        }
+
+        if (!resultado.changes) {
+            await fs.promises.unlink(fotoPath);
+            return res.redirect('/panel?error=photoUserMissing');
+        }
+
+        if (fotos.fotoGestionada(cuenta.foto)) {
+            try {
+                await fs.promises.unlink(path.join(avatarDirectory, cuenta.foto));
+            } catch (err) {
+                if (err.code !== 'ENOENT') {
+                    console.error('Error al borrar la foto anterior:', err);
+                }
+            }
+        }
+
+        res.redirect('/panel?notice=photoUpdated');
+    } catch (err) {
+        next(err);
+    }
+});
+
+router.post('/panel/alta-grupo', soloAdmin, async (req, res, next) => {
+    const nombre = typeof req.body.nombre === 'string' ? req.body.nombre.trim() : '';
+
+    if (!nombre || nombre.length > 50) {
+        return res.redirect('/panel?error=groupInvalid');
+    }
+
+    try {
+        await db.runAsync('INSERT INTO grupo (nombre) VALUES (?)', [nombre]);
+        res.redirect('/panel?notice=groupCreated');
+    } catch (err) {
+        if (err.code === 'SQLITE_CONSTRAINT' && err.message.includes('grupo.nombre')) {
+            return res.redirect('/panel?error=groupDuplicate');
+        }
+        next(err);
+    }
+});
+
+router.post('/panel/baja-grupo/:id_grupo', soloAdmin, async (req, res, next) => {
+    const idGrupo = Number(req.params.id_grupo);
+    if (!Number.isSafeInteger(idGrupo) || idGrupo < 1) {
+        return res.redirect('/panel?error=groupMissing');
+    }
+
+    try {
+        const resultado = await db.runAsync(`
+            DELETE FROM grupo
+            WHERE id_grupo = ?
+              AND NOT EXISTS (
+                  SELECT 1 FROM usuarios WHERE usuarios.id_grupo = grupo.id_grupo
+              )
+        `, [idGrupo]);
+
+        if (resultado.changes) {
+            return res.redirect('/panel?notice=groupDeleted');
+        }
+
+        const grupo = await db.getAsync(
+            'SELECT id_grupo FROM grupo WHERE id_grupo = ?',
+            [idGrupo]
+        );
+        if (!grupo) {
+            return res.redirect('/panel?error=groupMissing');
+        }
+
+        res.redirect('/panel?error=groupInUse');
     } catch (err) {
         next(err);
     }
@@ -182,6 +401,14 @@ router.post('/panel/alta-usuario', soloAdmin, async (req, res, next) => {
     }
 
     try {
+        const cuentaExistente = await db.getAsync(
+            'SELECT usuario FROM usuarios WHERE usuario COLLATE NOCASE = ?',
+            [usuario]
+        );
+        if (cuentaExistente) {
+            return res.redirect('/panel?error=duplicate');
+        }
+
         const passwordHash = await bcrypt.hash(password, 12);
         await db.runAsync(
             'INSERT INTO usuarios (usuario, nombre, password_hash, id_grupo, admin) VALUES (?, ?, ?, ?, ?)',

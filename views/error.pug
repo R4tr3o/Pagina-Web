@@ -1,6 +1,14 @@
 extends layout
 
 block content
-  h1= message
-  h2= error.status
-  pre #{error.stack}
+  section.error-card.content-card
+    p.page-kicker Algo no ha salido como esperábamos
+    if error && error.status
+      span.error-code Error #{error.status}
+    h1.page-title.mt-2= message || 'Ha ocurrido un error'
+    p.page-subtitle.mb-4 La página no está disponible en este momento. Puedes volver e intentarlo de nuevo.
+    a.btn.btn-primary(href=usuarioSesion ? '/inicio' : '/') Volver al inicio
+    if error && error.stack
+      details.mt-4
+        summary.small.text-muted Detalles técnicos
+        pre.error-stack.mt-2= error.stack
