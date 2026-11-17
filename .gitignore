@@ -60,5 +60,8 @@ typings/
 # next.js build output
 .next
 
+#Base de datos
+BBDD.db
+
 # Local database
 BBDD.db

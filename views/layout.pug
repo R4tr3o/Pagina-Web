@@ -4,4 +4,19 @@ html
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
+    nav
+      if usuarioSesion
+        a(href='/') Inicio
+        |  |
+        a(href='/mensajes') Chat
+        |  |
+        a(href='/cambiar-contrasena') Cambiar contraseña
+        if rolSesion === 'admin'
+          |  |
+          a(href='/panel') Panel
+        |  |
+        form(method='POST', action='/users/logout', style='display:inline')
+          button(type='submit') Cerrar sesión
+      else
+        a(href='/login') Iniciar sesión
     block content

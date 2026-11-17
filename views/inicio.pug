@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  h1 Bienvenido#{usuario ? ', ' + usuario.nombre : ''}
+  p Has iniciado sesión correctamente.
+
+  if usuario && usuario.id_grupo
+    p Grupo: #{usuario.nombre_grupo}
+    p
+      a(href='/mensajes') Entrar al chat de mi grupo
+  else
+    p Tu cuenta todavía no tiene un grupo asignado, así que no puedes acceder a un chat.
+
+  if admin
+    p
+      a(href='/panel') Ir al panel de administración

@@ -1,13 +1,13 @@
 extends layout
 
 block content
-  h1 Chat del Grupo #{id_grupo}
+  h1 Chat: #{nombre_grupo}
 
   .chat-box(style="border: 1px solid #ccc; padding: 15px; height: 300px; overflow-y: scroll; background: #f9f9f9;")
     each msg in mensajes
       p
-        strong #{msg.usuario}: 
-        span #{msg.texto}
+        strong= msg.usuario + ': '
+        span= msg.texto
         small(style="color: gray; margin-left: 10px;") #{msg.fecha_hora}
     else
       p No hay mensajes todavía en este grupo. ¡Sé el primero en escribir!
@@ -16,10 +16,6 @@ block content
   h3 Enviar Mensaje
   form(action="/mensajes/enviar" method="POST")
     input(type="hidden" name="id_grupo" value=id_grupo)
-    label Usuario: 
-    input(type="text" name="usuario" required placeholder="Tu nombre de usuario")
-    br
-    br
     textarea(name="texto" required placeholder="Escribe tu mensaje aquí..." rows="3" cols="40")
     br
     button(type="submit") Enviar Mensaje
