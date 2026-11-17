@@ -46,8 +46,52 @@ block content
               td= usuario.admin ? 'Administrador' : 'Usuario'
               td= usuario.nombre_grupo || 'Sin grupo'
               td
-                form(method='POST', action='/panel/baja-usuario/' + encodeURIComponent(usuario.usuario))
+                form(method='POST', action='/panel/modificar-usuario/' + encodeURIComponent(usuario.usuario))
+                  select(name='rol', aria-label='Rol de ' + usuario.usuario)
+                    if usuario.usuario === usuarioSesion
+                      option(value='admin', selected) Administrador
+                    else
+                      option(value='usuario', selected=!usuario.admin) Usuario normal
+                      option(value='admin', selected=!!usuario.admin) Administrador
+                  select(name='id_grupo', aria-label='Grupo de ' + usuario.usuario)
+                    option(value='', selected=!usuario.id_grupo) Sin grupo
+                    each grupo in grupos
+                      option(value=grupo.id_grupo, selected=usuario.id_grupo === grupo.id_grupo)= grupo.nombre
+                  button(type='submit') Guardar cambios
+                form.delete-user-form(method='POST', action='/panel/baja-usuario/' + encodeURIComponent(usuario.usuario))
                   button(type='submit', style='color: red') Borrar
         else
           tr
             td(colspan='5') No hay usuarios registrados.
+
+  dialog#confirm-delete-dialog(aria-labelledby='confirm-delete-title')
+    h2#confirm-delete-title Confirmar eliminación
+    p ¿Seguro que quieres borrar a este usuario? Esta acción no se puede deshacer.
+    div.confirm-delete-actions
+      button#cancel-delete(type='button') Cancelar
+      button#confirm-delete(type='button', style='color: red') Borrar
+
+  script.
+    (function () {
+      const dialog = document.getElementById('confirm-delete-dialog');
+      let pendingForm = null;
+
+      document.querySelectorAll('.delete-user-form').forEach((form) => {
+        form.addEventListener('submit', (event) => {
+          event.preventDefault();
+          pendingForm = form;
+          dialog.showModal();
+        });
+      });
+
+      document.getElementById('cancel-delete').addEventListener('click', () => {
+        pendingForm = null;
+        dialog.close();
+      });
+
+      document.getElementById('confirm-delete').addEventListener('click', () => {
+        if (pendingForm) {
+          HTMLFormElement.prototype.submit.call(pendingForm);
+        }
+      });
+    }());
