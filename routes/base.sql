@@ -58,7 +58,7 @@ INSERT OR IGNORE INTO usuarios (usuario, nombre, id_grupo, admin, foto)
 VALUES (
     'Pepe', 'Pepe Ramos',
     (SELECT id_grupo FROM grupo WHERE nombre = 'Diseño'),
-    0, NULL
+    0, 'dc32961fef1f7702e304f30deafce041.jpg'
 );
 
 UPDATE usuarios
@@ -74,7 +74,7 @@ SET foto = '1ab721620990f850c494734d55e654cc.jpg'
 WHERE usuario = 'Jose' AND foto = 'foto_jose.jpg';
 
 UPDATE usuarios
-SET foto = NULL
+SET foto = 'dc32961fef1f7702e304f30deafce041.jpg'
 WHERE usuario = 'Pepe' AND foto = 'foto_pepe.jpg';
 
 INSERT INTO mensajes (id_grupo, usuario, texto)
