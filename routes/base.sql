@@ -37,29 +37,45 @@ INSERT OR IGNORE INTO usuarios (usuario, nombre, id_grupo, admin, foto)
 VALUES (
     'ivan', 'Iván Guerrero',
     (SELECT id_grupo FROM grupo WHERE nombre = 'Desarrollo'),
-    1, 'foto_ivan.jpg'
+    1, '611a97b810bb618d742a2b69473d6303.jpg'
 );
 
 INSERT OR IGNORE INTO usuarios (usuario, nombre, id_grupo, admin, foto)
 VALUES (
     'Marcos', 'Marcos García',
     (SELECT id_grupo FROM grupo WHERE nombre = 'Desarrollo'),
-    0, 'foto_marcos.jpg'
+    0, '82ca7b4371a7fa599b7e32ac5ee7414c.jpg'
 );
 
 INSERT OR IGNORE INTO usuarios (usuario, nombre, id_grupo, admin, foto)
 VALUES (
     'Jose', 'José Gonzalez',
     (SELECT id_grupo FROM grupo WHERE nombre = 'Diseño'),
-    0, 'foto_jose.jpg'
+    0, '1ab721620990f850c494734d55e654cc.jpg'
 );
 
 INSERT OR IGNORE INTO usuarios (usuario, nombre, id_grupo, admin, foto)
 VALUES (
     'Pepe', 'Pepe Ramos',
     (SELECT id_grupo FROM grupo WHERE nombre = 'Diseño'),
-    0, 'foto_pepe.jpg'
+    0, NULL
 );
+
+UPDATE usuarios
+SET foto = '611a97b810bb618d742a2b69473d6303.jpg'
+WHERE usuario = 'ivan' AND foto = 'foto_ivan.jpg';
+
+UPDATE usuarios
+SET foto = '82ca7b4371a7fa599b7e32ac5ee7414c.jpg'
+WHERE usuario = 'Marcos' AND foto = 'foto_marcos.jpg';
+
+UPDATE usuarios
+SET foto = '1ab721620990f850c494734d55e654cc.jpg'
+WHERE usuario = 'Jose' AND foto = 'foto_jose.jpg';
+
+UPDATE usuarios
+SET foto = NULL
+WHERE usuario = 'Pepe' AND foto = 'foto_pepe.jpg';
 
 INSERT INTO mensajes (id_grupo, usuario, texto)
 SELECT grupo.id_grupo, 'ivan', '¡Hola! Bienvenidos al chat del grupo de Desarrollo.'
