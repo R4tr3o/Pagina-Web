@@ -23,7 +23,7 @@ La aplicación guarda los datos en `routes/BBDD.db`. Al arrancar, crea las tabla
 - Para pruebas, las cuentas de ejemplo `Marcos`, `Jose` y `Pepe` usan respectivamente `Marcos1234`, `Jose1234` y `Pepe1234`. Son contraseñas débiles: cámbialas antes de usar cuentas reales. Solo se asignan si la cuenta todavía no tiene contraseña.
 - En producción, configura `SESSION_SECRET` y las credenciales iniciales en el entorno. No uses las credenciales de desarrollo.
 - El panel permite crear usuarios y cambiar el rol o grupo de las cuentas existentes. No permite quitar el rol del administrador conectado ni dejar el sistema sin administradores. Las contraseñas nuevas se guardan como hashes bcrypt.
-- El administrador puede subir o cambiar la foto de cada usuario desde el panel. Se aceptan JPG, PNG y WebP de hasta 2 MB; las fotos se guardan localmente y solo se sirven a usuarios con sesión iniciada.
+- El administrador puede subir o cambiar la foto de cada usuario desde el panel. Se aceptan JPG, PNG y WebP de hasta 2 MB; las fotos se guardan en `uploads/avatars/`, se incluyen en Git para compartirlas con el equipo y solo se sirven a usuarios con sesión iniciada. Para que un compañero reciba fotos nuevas, hay que incluirlas en un commit y subirlo al remoto.
 - El panel permite crear y borrar grupos. Un grupo con usuarios asignados no se puede borrar; al borrar un grupo vacío también se borran sus mensajes.
 - Cada usuario con una contraseña configurada puede cambiarla desde el menú «Cambiar contraseña», confirmando primero su contraseña actual.
 - Los grupos son opcionales al crear una cuenta. Para asignarlos, debe existir previamente el grupo en la tabla `grupo`.
