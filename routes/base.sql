@@ -75,7 +75,8 @@ WHERE usuario = 'Jose' AND foto = 'foto_jose.jpg';
 
 UPDATE usuarios
 SET foto = 'dc32961fef1f7702e304f30deafce041.jpg'
-WHERE usuario = 'Pepe' AND foto = 'foto_pepe.jpg';
+WHERE usuario = 'Pepe'
+  AND (foto IS NULL OR foto = '' OR foto = 'foto_pepe.jpg');
 
 INSERT INTO mensajes (id_grupo, usuario, texto)
 SELECT grupo.id_grupo, 'ivan', '¡Hola! Bienvenidos al chat del grupo de Desarrollo.'
