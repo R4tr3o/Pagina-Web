@@ -18,10 +18,8 @@ La aplicación guarda los datos en `routes/BBDD.db`. Al arrancar, crea las tabla
 
 ## Usuarios y acceso
 
-- En desarrollo, el acceso inicial de administrador es `admin` / `1234`, siempre que no exista ya un usuario `admin` en la base de datos.
-- Para importar una sola vez los grupos, usuarios y mensaje de ejemplo de `routes/base.sql`, establece `SEED_SAMPLE_DATA=true` y `INITIAL_ADMIN_PASSWORD` (mínimo 8 caracteres) antes de arrancar. La contraseña se guarda como hash bcrypt; el archivo SQL no contiene contraseñas. La importación es idempotente y no reemplaza registros existentes. Después de importarla, puedes quitar `SEED_SAMPLE_DATA`.
-- Para pruebas, las cuentas de ejemplo `Marcos`, `Jose` y `Pepe` usan respectivamente `Marcos1234`, `Jose1234` y `Pepe1234`. Son contraseñas débiles: cámbialas antes de usar cuentas reales. Solo se asignan si la cuenta todavía no tiene contraseña.
-- En producción, configura `SESSION_SECRET` y las credenciales iniciales en el entorno. No uses las credenciales de desarrollo.
+- En desarrollo, los grupos, usuarios y mensaje de ejemplo de `routes/base.sql` se cargan automáticamente al arrancar. La cuenta administradora es `ivan` / `Ivan1234`; las cuentas `Marcos`, `Jose` y `Pepe` usan respectivamente `Marcos1234`, `Jose1234` y `Pepe1234`. Las contraseñas se guardan como hashes bcrypt y solo se asignan a cuentas que todavía no tienen contraseña.
+- Estas son credenciales de desarrollo conocidas: cámbialas antes de usar cuentas reales. En producción, configura `SESSION_SECRET`, `SEED_SAMPLE_DATA=true` e `INITIAL_ADMIN_PASSWORD` de forma segura en el entorno; no uses las credenciales de desarrollo.
 - El panel permite crear usuarios y cambiar el rol o grupo de las cuentas existentes. No permite quitar el rol del administrador conectado ni dejar el sistema sin administradores. Las contraseñas nuevas se guardan como hashes bcrypt.
 - El administrador puede subir o cambiar la foto de cada usuario desde el panel. Se aceptan JPG, PNG y WebP de hasta 2 MB; las fotos se guardan en `uploads/avatars/`, se incluyen en Git para compartirlas con el equipo y solo se sirven a usuarios con sesión iniciada. Para que un compañero reciba fotos nuevas, hay que incluirlas en un commit y subirlo al remoto.
 - El panel permite crear y borrar grupos. Un grupo con usuarios asignados no se puede borrar; al borrar un grupo vacío también se borran sus mensajes.
@@ -31,10 +29,8 @@ La aplicación guarda los datos en `routes/BBDD.db`. Al arrancar, crea las tabla
 - Después de iniciar sesión, todos los usuarios llegan a `/inicio`. Desde allí acceden al chat de su grupo y los administradores también al panel. Los mensajes se publican con el usuario de la sesión, y un usuario no puede leer ni escribir en el chat de otro grupo.
 - Si las credenciales no son correctas, se vuelve al login y se muestra un aviso. El menú también permite cerrar sesión.
 
-En PowerShell, ejecuta una vez, cambiando la contraseña por una propia:
+Para iniciar en desarrollo, basta con ejecutar:
 
 ```powershell
-$env:SEED_SAMPLE_DATA = 'true'
-$env:INITIAL_ADMIN_PASSWORD = 'elige-una-contraseña'
 npm start
 ```

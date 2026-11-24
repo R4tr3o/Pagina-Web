@@ -69,11 +69,15 @@ db.ready = (async () => {
         await db.runAsync('ALTER TABLE usuarios ADD COLUMN foto TEXT');
     }
 
-    if (process.env.SEED_SAMPLE_DATA !== 'true') {
+    const seedSampleData = process.env.NODE_ENV !== 'production' ||
+        process.env.SEED_SAMPLE_DATA === 'true';
+    if (!seedSampleData) {
         return;
     }
 
-    const adminPassword = process.env.INITIAL_ADMIN_PASSWORD || '';
+    const adminPassword = process.env.NODE_ENV === 'production'
+        ? process.env.INITIAL_ADMIN_PASSWORD || ''
+        : 'Ivan1234';
     const passwordLength = Buffer.byteLength(adminPassword, 'utf8');
     if (passwordLength < 8 || passwordLength > 72) {
         throw new Error('INITIAL_ADMIN_PASSWORD debe tener entre 8 y 72 bytes para importar los datos de ejemplo.');
